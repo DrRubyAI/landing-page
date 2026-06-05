@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DrRuby.ai — Women's Healthspan Intelligence</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --black:   #1a1a1a;
+  --white:   #ffffff;
+  --off:     #f5f5f5;
+  --red:     #d0021b;
+  --red-lt:  #fdf0f2;
+  --red-mid: #f47f8e;
+  --text:    #1a1a1a;
+  --muted:   #888;
+  --border:  #e0e0e0;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--off);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  font-size: 20px; font-weight: 700; letter-spacing: -0.5px;
+  color: var(--black); text-decoration: none;
+}
+.nav-logo span { color: var(--red); }
+.nav-tagline {
+  font-size: 13px; color: var(--muted); letter-spacing: 0.02em;
+}
+.nav-cta {
+  background: var(--red); color: var(--white);
+  padding: 9px 22px; border-radius: 8px;
+  font-size: 14px; font-weight: 600;
+  text-decoration: none; transition: opacity 0.2s;
+}
+.nav-cta:hover { opacity: 0.85; }
+
+/* ── HERO ── */
+.hero-wrapper {
+  background: radial-gradient(ellipse at 60% 0%, #fce8eb 0%, var(--off) 65%);
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding-top: 64px;
+}
+.hero-inner {
+  max-width: 1100px; margin: 0 auto;
+  padding: 80px 40px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--red-lt); border: 1px solid #f5b8c0; color: #a00015;
+  font-size: 13px; font-weight: 500; padding: 7px 16px;
+  border-radius: 20px; margin-bottom: 32px; letter-spacing: 0.2px;
+}
+.hero-badge::before { content: "●"; color: var(--red); font-size: 8px; }
+.hero-title {
+  font-size: clamp(40px, 5vw, 68px);
+  font-weight: 700; letter-spacing: -2px; line-height: 1.05;
+  color: var(--black); margin-bottom: 20px;
+  max-width: 800px;
+}
+.hero-title em { font-style: normal; color: var(--red); }
+.hero-sub {
+  font-size: 19px; color: #555; margin-bottom: 56px;
+  line-height: 1.7; max-width: 580px;
+}
+
+/* ── PATH CARDS ── */
+.paths {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 24px; width: 100%; max-width: 880px;
+  margin-bottom: 48px;
+}
+.path-card {
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 20px; padding: 36px 32px;
+  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column;
+  text-align: left; transition: all 0.2s;
+  cursor: pointer; position: relative;
+  overflow: hidden;
+}
+.path-card:hover {
+  border-color: var(--red);
+  box-shadow: 0 8px 40px rgba(208,2,27,0.1);
+  transform: translateY(-2px);
+}
+.path-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--red); opacity: 0;
+  transition: opacity 0.2s;
+}
+.path-card:hover::before { opacity: 1; }
+.path-num {
+  font-size: 13px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--red);
+  margin-bottom: 16px;
+}
+.path-title {
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 700; letter-spacing: -0.5px; line-height: 1.2;
+  color: var(--black); margin-bottom: 14px;
+}
+.path-title em { font-style: italic; color: var(--red); }
+.path-desc {
+  font-size: 15px; color: #666; line-height: 1.65;
+  margin-bottom: 24px; flex: 1;
+}
+.path-tags {
+  display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 28px;
+}
+.ptag {
+  font-size: 12px; font-weight: 500;
+  background: var(--off); border: 1px solid var(--border);
+  padding: 4px 12px; border-radius: 20px; color: #555;
+}
+.path-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 600;
+  color: var(--white); background: var(--red);
+  padding: 12px 22px; border-radius: 8px;
+  transition: opacity 0.2s; align-self: flex-start;
+}
+.path-cta:hover { opacity: 0.85; }
+
+/* ── PHILOSOPHY ── */
+.philosophy {
+  background: var(--black);
+  padding: 80px 40px;
+}
+.phil-inner { max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--red-mid);
+  margin-bottom: 14px;
+}
+.section-title {
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700; letter-spacing: -1px; line-height: 1.15;
+  color: var(--white); margin-bottom: 14px;
+}
+.section-sub {
+  font-size: 17px; color: #aaa;
+  max-width: 560px; line-height: 1.7; margin-bottom: 48px;
+}
+.phil-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.phil-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px; padding: 28px 24px;
+}
+.phil-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+.phil-card-title {
+  font-size: 17px; font-weight: 700; color: var(--white);
+  margin-bottom: 10px; letter-spacing: -0.2px;
+}
+.phil-card-text {
+  font-size: 14px; color: #bbb; line-height: 1.65;
+  margin-bottom: 12px;
+}
+.phil-card-quote {
+  font-size: 14px; font-style: italic;
+  color: var(--red-mid); line-height: 1.5;
+}
+
+/* ── SCIENCE TRUST ── */
+.trust {
+  background: var(--white);
+  padding: 80px 40px;
+  border-top: 1px solid var(--border);
+}
+.trust-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center;
+  gap: 64px;
+}
+.trust-left { flex: 1; }
+.trust-label {
+  font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 12px;
+}
+.trust-title {
+  font-size: clamp(24px, 3vw, 38px);
+  font-weight: 700; letter-spacing: -1px; line-height: 1.2;
+  color: var(--black); margin-bottom: 14px;
+}
+.trust-title em { font-style: italic; color: var(--red); }
+.trust-body {
+  font-size: 16px; color: #666; line-height: 1.7; max-width: 400px;
+}
+.trust-stats {
+  display: flex; flex-direction: column; gap: 12px; flex-shrink: 0;
+}
+.trust-stat {
+  background: var(--off); border: 1px solid var(--border);
+  border-left: 4px solid var(--red);
+  border-radius: 10px; padding: 20px 24px;
+  min-width: 220px;
+}
+.tstat-num {
+  font-size: 28px; font-weight: 700; letter-spacing: -1px;
+  color: var(--red); line-height: 1; margin-bottom: 4px;
+}
+.tstat-label {
+  font-size: 13px; color: var(--muted); line-height: 1.4;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--black); color: #666;
+  padding: 40px; text-align: center; font-size: 14px;
+}
+footer a { color: #888; text-decoration: none; }
+.footer-links {
+  display: flex; gap: 28px; justify-content: center;
+  list-style: none; margin-bottom: 16px;
+}
+.footer-links a:hover { color: var(--white); }
+
+@media (max-width: 860px) {
+  nav { padding: 0 20px; }
+  .nav-tagline { display: none; }
+  .hero-inner { padding: 60px 20px; }
+  .paths { grid-template-columns: 1fr; max-width: 480px; }
+  .philosophy { padding: 60px 20px; }
+  .phil-grid { grid-template-columns: 1fr; }
+  .trust { padding: 60px 20px; }
+  .trust-inner { flex-direction: column; gap: 32px; }
+  .trust-stats { flex-direction: row; flex-wrap: wrap; }
+  .trust-stat { min-width: auto; flex: 1; }
+  footer { padding: 32px 20px; }
+  .footer-links { flex-wrap: wrap; gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">Dr<span>Ruby</span>.ai</a>
+  <span class="nav-tagline">Women's Healthspan Intelligence</span>
+  <a href="#paths" class="nav-cta">Get Early Access</a>
+</nav>
+
+<div class="hero-wrapper">
+  <div class="hero-inner">
+    <div class="hero-badge">Early Access — Limited Spots</div>
+    <h1 class="hero-title">
+      Something is changing.<br>
+      <em>Understand it.</em>
+    </h1>
+    <p class="hero-sub">
+      DrRuby is a women's healthspan intelligence platform. We enter through skin — and connect it to everything else that's shifting in your body. Tell us where you're feeling it most.
+    </p>
+
+    <div class="paths" id="paths">
+      <a href="skin.html" class="path-card">
+        <div class="path-num">Path 01 · Skin</div>
+        <h2 class="path-title">"My skin changed and I don't know <em>why.</em>"</h2>
+        <p class="path-desc">Inflammation, melasma, skin that aged faster than expected. DrRuby tracks three imaging biomarkers so you stop guessing and start seeing what's actually happening.</p>
+        <div class="path-tags">
+          <span class="ptag">Inflammation</span>
+          <span class="ptag">Melasma</span>
+          <span class="ptag">Hormonal skin</span>
+          <span class="ptag">Product efficacy</span>
+        </div>
+        <span class="path-cta">I have skin concerns →</span>
+      </a>
+
+      <a href="healthspan.html" class="path-card">
+        <div class="path-num">Path 02 · Healthspan</div>
+        <h2 class="path-title">"My body isn't keeping up with my <em>life.</em>"</h2>
+        <p class="path-desc">Energy, sleep, recovery, hormones. Something shifted in the last few years and you can't quite name it. That's exactly what DrRuby is built for.</p>
+        <div class="path-tags">
+          <span class="ptag">Sleep & recovery</span>
+          <span class="ptag">Energy</span>
+          <span class="ptag">Perimenopause</span>
+          <span class="ptag">Hormonal resilience</span>
+        </div>
+        <span class="path-cta">I want better healthspan →</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy">
+  <div class="phil-inner">
+    <div class="section-label">What We Believe</div>
+    <h2 class="section-title">Built for life goals.<br>Not lab dashboards.</h2>
+    <p class="section-sub">
+      Every other healthspan tool rewards you for checking in more, tracking more. We don't. We want you to close the app and go live your life.
+    </p>
+    <div class="phil-grid">
+      <div class="phil-card">
+        <span class="phil-icon">🎯</span>
+        <div class="phil-card-title">Goals, not metrics</div>
+        <p class="phil-card-text">We don't ask what you want to optimize. We ask what you want to do that your body isn't letting you.</p>
+        <div class="phil-card-quote">"Hike with my grandkids." "No more hot flashes at 2am." "Finish the day I planned."</div>
+      </div>
+      <div class="phil-card">
+        <span class="phil-icon">📵</span>
+        <div class="phil-card-title">We want you to close the app</div>
+        <p class="phil-card-text">Every month we ask: is this tracking helping you reach your goal, or has it become the goal? We coach you toward less dependency, not more.</p>
+        <div class="phil-card-quote">"Actually closed the app. Went outside. Felt like a win."</div>
+      </div>
+      <div class="phil-card">
+        <span class="phil-icon">🔬</span>
+        <div class="phil-card-title">Science you can name</div>
+        <p class="phil-card-text">Led by Charles Brenner, PhD — the world's leading NAD+ researcher. Every claim we make is traceable to published research, not a marketing team.</p>
+        <div class="phil-card-quote">"Reliable numbers, not great experiences with unreliable data."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="trust">
+  <div class="trust-inner">
+    <div class="trust-left">
+      <div class="trust-label">Scientific Foundation</div>
+      <h2 class="trust-title">No other consumer healthspan app has <em>this.</em></h2>
+      <p class="trust-body">
+        Charles Brenner is the researcher who discovered NR as vitamin B3 — his work is the foundation of NAD+ biology. He's not an advisor. He's co-building this with us.
+      </p>
+    </div>
+    <div class="trust-stats">
+      <div class="trust-stat">
+        <div class="tstat-num">NAD+</div>
+        <div class="tstat-label">Charles Brenner, PhD<br>Biochemist · NAD+ Biology Pioneer</div>
+      </div>
+      <div class="trust-stat">
+        <div class="tstat-num">N=1</div>
+        <div class="tstat-label">Evidence-based<br>user experiments</div>
+      </div>
+      <div class="trust-stat">
+        <div class="tstat-num">Live</div>
+        <div class="tstat-label">Clinic partnerships<br>already active</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <ul class="footer-links">
+    <li><a href="#">Science</a></li>
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">For Clinics</a></li>
+    <li><a href="#">Research Partners</a></li>
+    <li><a href="mailto:ruby@drruby.ai">Contact</a></li>
+  </ul>
+  <div>© 2026 DrRuby.ai · Wellness device. Not intended to diagnose or treat any medical condition.</div>
+</footer>
+
+</body>
+</html>

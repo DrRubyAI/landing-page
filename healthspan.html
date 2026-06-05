@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DrRuby.ai — Healthspan Intelligence</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --black:   #1a1a1a;
+  --white:   #ffffff;
+  --off:     #f5f5f5;
+  --red:     #d0021b;
+  --red-lt:  #fdf0f2;
+  --red-mid: #f47f8e;
+  --text:    #1a1a1a;
+  --muted:   #888;
+  --border:  #e0e0e0;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--off); color: var(--text);
+  line-height: 1.6; -webkit-font-smoothing: antialiased; font-size: 16px;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border); padding: 0 40px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--black); text-decoration: none; }
+.nav-logo span { color: var(--red); }
+.nav-back {
+  font-size: 14px; font-weight: 500; color: var(--muted); text-decoration: none;
+  display: flex; align-items: center; gap: 6px; transition: color 0.2s;
+}
+.nav-back:hover { color: var(--red); }
+
+/* HERO */
+.hero-wrapper {
+  background: radial-gradient(ellipse at 30% 0%, #fce8eb 0%, var(--off) 65%);
+  min-height: 80vh; display: flex; align-items: center; padding-top: 64px;
+}
+.hero-inner {
+  max-width: 1100px; margin: 0 auto; padding: 80px 40px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--red-lt); border: 1px solid #f5b8c0; color: #a00015;
+  font-size: 13px; font-weight: 500; padding: 7px 16px;
+  border-radius: 20px; margin-bottom: 24px;
+}
+.hero-badge::before { content: "●"; color: var(--red); font-size: 8px; }
+.hero-title {
+  font-size: clamp(36px, 4vw, 56px); font-weight: 700;
+  letter-spacing: -1.5px; line-height: 1.08;
+  color: var(--black); margin-bottom: 18px;
+}
+.hero-title em { font-style: italic; color: var(--red); }
+.hero-sub {
+  font-size: 18px; color: #555; margin-bottom: 32px;
+  line-height: 1.7; max-width: 460px;
+}
+.hero-goals { display: flex; flex-direction: column; gap: 0; margin-bottom: 32px; }
+.goal-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+  font-size: 16px; font-style: italic; color: #555;
+}
+.goal-item:last-child { border-bottom: none; }
+.goal-item::before { content: "→"; color: var(--red); font-style: normal; font-weight: 700; }
+.hero-cta {
+  background: var(--red); color: var(--white);
+  padding: 14px 28px; border-radius: 10px;
+  font-size: 16px; font-weight: 600; text-decoration: none;
+  display: inline-block; transition: opacity 0.2s;
+}
+.hero-cta:hover { opacity: 0.85; }
+
+/* INDEX PREVIEW CARD */
+.idx-card {
+  background: var(--white);
+  border: 1px solid var(--border); border-radius: 20px;
+  padding: 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+.idx-card-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 16px;
+}
+.idx-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.idx-row:last-of-type { border-bottom: none; margin-bottom: 16px; }
+.idx-icon { font-size: 20px; flex-shrink: 0; width: 28px; }
+.idx-info { flex: 1; }
+.idx-name { font-size: 14px; font-weight: 700; color: var(--black); margin-bottom: 2px; }
+.idx-meaning { font-size: 12px; font-style: italic; color: var(--muted); }
+.idx-phase {
+  font-size: 11px; font-weight: 700; padding: 4px 10px;
+  border-radius: 20px; flex-shrink: 0;
+}
+.phase-stable { background: #e8f5ee; color: #1a7a45; }
+.phase-shift  { background: var(--red-lt); color: var(--red); }
+.phase-ok     { background: #f0f0f0; color: var(--muted); }
+.idx-note {
+  border-left: 3px solid var(--red);
+  background: var(--red-lt); border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  font-size: 13px; font-style: italic; color: #a00015; line-height: 1.6;
+}
+
+/* SHARED */
+.section-wrap { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
+.section-label {
+  font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(28px, 4vw, 42px); font-weight: 700;
+  letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; color: var(--black);
+}
+.section-title em { font-style: italic; color: var(--red); }
+.section-sub {
+  font-size: 17px; color: #666; max-width: 540px;
+  line-height: 1.7; margin-bottom: 48px;
+}
+
+/* WHAT WE TRACK */
+.track-section { padding: 80px 0; background: var(--white); }
+.track-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.t-card {
+  background: var(--off); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px 24px;
+  border-top: 3px solid transparent; transition: border-top-color 0.2s;
+}
+.t-card:hover { border-top-color: var(--red); }
+.t-card-q { font-size: 20px; font-style: italic; font-weight: 600; color: var(--black); margin-bottom: 10px; }
+.t-card-name {
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 10px;
+}
+.t-card-desc { font-size: 14px; color: #666; line-height: 1.65; margin-bottom: 12px; }
+.t-card-signals { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.t-card-signals strong { font-weight: 600; color: #555; }
+
+/* PHILOSOPHY STRIP */
+.phil-strip { background: var(--red); padding: 56px 0; }
+.phil-strip-inner {
+  max-width: 1100px; margin: 0 auto; padding: 0 40px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+}
+.ps-item { border-right: 1px solid rgba(255,255,255,0.2); padding-right: 32px; }
+.ps-item:last-child { border-right: none; }
+.ps-title { font-size: 16px; font-weight: 700; color: white; margin-bottom: 8px; }
+.ps-text { font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.65; }
+
+/* PROOF */
+.proof-section { padding: 80px 0; background: var(--off); }
+.proof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.proof-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px;
+}
+.proof-quote {
+  font-size: 18px; font-style: italic; color: var(--black);
+  line-height: 1.65; margin-bottom: 16px;
+}
+.proof-quote strong { font-style: normal; color: var(--red); }
+.proof-attr { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); }
+
+/* FORM */
+.form-section { padding: 80px 0; background: var(--white); border-top: 1px solid var(--border); }
+.form-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+.form-box {
+  background: var(--off); border: 1px solid var(--border);
+  border-radius: 20px; padding: 36px;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+}
+.form-box h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
+.form-box > p { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: #555; }
+.form-input, .form-select {
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 15px; font-family: inherit; background: var(--white); outline: none;
+  transition: border-color 0.2s; color: var(--text); -webkit-appearance: none;
+}
+.form-input:focus, .form-select:focus { border-color: var(--red); }
+.form-input::placeholder { color: #bbb; }
+.cb-group { display: flex; flex-direction: column; gap: 10px; }
+.cb-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.cb-item input { display: none; }
+.cb-box {
+  width: 18px; height: 18px; border: 1.5px solid var(--border); border-radius: 4px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
+.cb-item input:checked + .cb-box { background: var(--red); border-color: var(--red); }
+.cb-item input:checked + .cb-box::after { content: '✓'; font-size: 11px; color: white; font-weight: 700; }
+.cb-text { font-size: 15px; color: var(--text); }
+.form-note { font-size: 12px; color: #aaa; line-height: 1.5; margin-bottom: 16px; }
+.submit-btn {
+  width: 100%; background: var(--red); color: var(--white); border: none;
+  padding: 15px; border-radius: 10px; font-family: inherit;
+  font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+}
+.submit-btn:hover { opacity: 0.85; }
+
+/* FOOTER */
+footer { background: var(--black); color: #666; padding: 40px; text-align: center; font-size: 14px; }
+
+@media (max-width: 860px) {
+  nav { padding: 0 20px; }
+  .hero-inner { grid-template-columns: 1fr; padding: 60px 20px; gap: 32px; }
+  .idx-card { display: none; }
+  .section-wrap { padding: 0 20px; }
+  .track-grid, .proof-grid, .form-wrap { grid-template-columns: 1fr; }
+  .track-section, .proof-section, .form-section { padding: 60px 0; }
+  .phil-strip-inner { grid-template-columns: 1fr; gap: 24px; }
+  .ps-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.2); padding: 0 0 20px; }
+  .ps-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Dr<span>Ruby</span>.ai</a>
+  <a href="index.html" class="nav-back">← Back</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero-wrapper">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">Healthspan Intelligence · Path 02</div>
+      <h1 class="hero-title">Your body is in <em>transition.</em> Understand it.</h1>
+      <p class="hero-sub">Energy, sleep, recovery, hormones. Something shifted in the last few years and you can't quite name it. DrRuby gives you the language — backed by science, built for women.</p>
+      <div class="hero-goals">
+        <div class="goal-item">Hike with my grandkids without running out of breath</div>
+        <div class="goal-item">Sleep through the night — actually restored</div>
+        <div class="goal-item">No more hot flashes keeping me up at 2am</div>
+        <div class="goal-item">Know which supplements are actually helping</div>
+      </div>
+      <a href="#join" class="hero-cta">Join the Waitlist →</a>
+    </div>
+    <div class="idx-card">
+      <div class="idx-card-label">Your healthspan snapshot</div>
+      <div class="idx-row">
+        <div class="idx-icon">⟳</div>
+        <div class="idx-info">
+          <div class="idx-name">Hormonal Resilience</div>
+          <div class="idx-meaning">"Is my body still stable?"</div>
+        </div>
+        <span class="idx-phase phase-shift">Transition</span>
+      </div>
+      <div class="idx-row">
+        <div class="idx-icon">↑</div>
+        <div class="idx-info">
+          <div class="idx-name">Recovery Capacity</div>
+          <div class="idx-meaning">"Can I still recover?"</div>
+        </div>
+        <span class="idx-phase phase-stable">Stable</span>
+      </div>
+      <div class="idx-row">
+        <div class="idx-icon">◈</div>
+        <div class="idx-info">
+          <div class="idx-name">Inflammaging Velocity</div>
+          <div class="idx-meaning">"Am I chronically burning out?"</div>
+        </div>
+        <span class="idx-phase phase-shift">Elevated</span>
+      </div>
+      <div class="idx-row">
+        <div class="idx-icon">◉</div>
+        <div class="idx-info">
+          <div class="idx-name">Sleep Restoration</div>
+          <div class="idx-meaning">"Did sleep actually restore me?"</div>
+        </div>
+        <span class="idx-phase phase-ok">Moderate</span>
+      </div>
+      <div class="idx-note">
+        "Not testing your hormones — inferring their impact from skin, sleep, recovery, and the signals your body is already giving you."
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT WE TRACK -->
+<section class="track-section">
+  <div class="section-wrap">
+    <div class="section-label">What We Track</div>
+    <h2 class="section-title">Seven questions your body is <em>asking.</em></h2>
+    <p class="section-sub">Not biomarker panels. Questions with emotional meaning — the ones you already feel but can't measure.</p>
+    <div class="track-grid">
+      <div class="t-card">
+        <div class="t-card-q">"Is my body still stable?"</div>
+        <div class="t-card-name">Hormonal Resilience Index™</div>
+        <p class="t-card-desc">Not testing hormones — inferring their impact on your body. The most important index for women in perimenopause.</p>
+        <div class="t-card-signals"><strong>Signals:</strong> sleep fragmentation, facial flushing, skin dryness, mood variability, cycle irregularity</div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-q">"Can I still recover?"</div>
+        <div class="t-card-name">Recovery Capacity Score™</div>
+        <p class="t-card-desc">How fast can your body return to baseline after stress, exertion, or a bad night? More meaningful than "biological age."</p>
+        <div class="t-card-signals"><strong>Signals:</strong> exercise recovery, sleep restoration, stress recovery, skin repair speed</div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-q">"Am I chronically burning out?"</div>
+        <div class="t-card-name">Inflammaging Velocity™</div>
+        <p class="t-card-desc">Inflammaging — inflammation + aging — is the mechanism behind most midlife health decline. We track its velocity, not just its level.</p>
+        <div class="t-card-signals"><strong>Signals:</strong> skin redness, stress load, poor sleep, metabolic variability</div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-q">"Did sleep actually restore me?"</div>
+        <div class="t-card-name">Sleep Restoration Score™</div>
+        <p class="t-card-desc">Not how many hours — whether sleep did its job. The question women in midlife are actually asking.</p>
+        <div class="t-card-signals"><strong>Signals:</strong> morning recovery pattern, skin hydration recovery, energy baseline on waking</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY STRIP -->
+<div class="phil-strip">
+  <div class="phil-strip-inner">
+    <div class="ps-item">
+      <div class="ps-title">Goals, not metrics</div>
+      <p class="ps-text">We start with what you want to do. Not what you want to optimize. Your goal shapes everything we track.</p>
+    </div>
+    <div class="ps-item">
+      <div class="ps-title">We want you to close the app</div>
+      <p class="ps-text">Every month we ask: is this tracking bringing you closer to your life, or replacing it? We coach you toward less dependency.</p>
+    </div>
+    <div class="ps-item">
+      <div class="ps-title">Science led by Charles Brenner, PhD</div>
+      <p class="ps-text">World's leading NAD+ researcher. Every index we build is traceable to published research — not a marketing team.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PROOF -->
+<section class="proof-section">
+  <div class="section-wrap">
+    <div class="section-label">Early Users</div>
+    <h2 class="section-title">Real life wins. Not <em>dashboard wins.</em></h2>
+    <div class="proof-grid" style="margin-top:0">
+      <div class="proof-card">
+        <p class="proof-quote">"I tracked my HRV and sleep for two years. None of it told me why I was exhausted. DrRuby was the first thing that <strong>asked what I actually wanted to do.</strong>"</p>
+        <div class="proof-attr">Sarah M. · 44 · Perimenopause · Early Beta</div>
+      </div>
+      <div class="proof-card">
+        <p class="proof-quote">"I stopped taking <strong>4 supplements</strong> after DrRuby showed no measurable change after 8 weeks. That alone paid for the whole year."</p>
+        <div class="proof-attr">Linda K. · 51 · Post-menopause · Early Beta</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section" id="join">
+  <div class="section-wrap">
+    <div class="form-wrap">
+      <div>
+        <div class="section-label">Join the Waitlist</div>
+        <h2 class="section-title">Give your body a <em>language.</em></h2>
+        <p class="section-sub">First 500 users get 3 months of Pro free. Tell us what you're experiencing — we'll make sure DrRuby is built for you.</p>
+      </div>
+      <form class="form-box" onsubmit="handleSubmit(event)">
+        <h3>Get Early Access</h3>
+        <p>Join the waitlist — free preview included at launch.</p>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">First Name</label>
+            <input class="form-input" type="text" placeholder="Your name" required>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" placeholder="your@email.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Age range</label>
+          <select class="form-select">
+            <option value="" disabled selected>Select your age</option>
+            <option>30–39</option>
+            <option>40–49</option>
+            <option>50–59</option>
+            <option>60+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">What are you experiencing? (pick all that apply)</label>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">Fatigue or energy crashes during the day</span></label>
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">Sleep that doesn't feel restorative</span></label>
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">Perimenopause or menopause symptoms</span></label>
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">Slower recovery from exercise or stress</span></label>
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">I take supplements and want to know if they work</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">What does "winning" look like for you?</label>
+          <input class="form-input" type="text" placeholder="e.g. Hike with my kids, sleep through the night...">
+        </div>
+        <p class="form-note">No spam, ever. You can unsubscribe at any time.</p>
+        <button type="submit" class="submit-btn">Join the Waitlist →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 DrRuby.ai · Wellness device. Not intended to diagnose or treat any medical condition.</footer>
+
+<script>
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.submit-btn');
+  btn.textContent = '✓ You\'re on the list!';
+  btn.style.background = '#1a7a45';
+  btn.disabled = true;
+}
+document.querySelectorAll('.cb-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const cb = item.querySelector('input[type="checkbox"]');
+    cb.checked = !cb.checked;
+  });
+});
+</script>
+</body>
+</html>

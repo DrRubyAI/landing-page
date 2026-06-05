@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DrRuby.ai — Skin Intelligence</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --black:   #1a1a1a;
+  --white:   #ffffff;
+  --off:     #f5f5f5;
+  --red:     #d0021b;
+  --red-lt:  #fdf0f2;
+  --red-mid: #f47f8e;
+  --text:    #1a1a1a;
+  --muted:   #888;
+  --border:  #e0e0e0;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--off); color: var(--text);
+  line-height: 1.6; -webkit-font-smoothing: antialiased; font-size: 16px;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border); padding: 0 40px; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--black); text-decoration: none; }
+.nav-logo span { color: var(--red); }
+.nav-back {
+  font-size: 14px; font-weight: 500; color: var(--muted); text-decoration: none;
+  display: flex; align-items: center; gap: 6px; transition: color 0.2s;
+}
+.nav-back:hover { color: var(--red); }
+
+/* HERO */
+.hero-wrapper {
+  background: radial-gradient(ellipse at 70% 0%, #fce8eb 0%, var(--off) 65%);
+  min-height: 80vh; display: flex; align-items: center; padding-top: 64px;
+}
+.hero-inner {
+  max-width: 1100px; margin: 0 auto; padding: 80px 40px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--red-lt); border: 1px solid #f5b8c0; color: #a00015;
+  font-size: 13px; font-weight: 500; padding: 7px 16px;
+  border-radius: 20px; margin-bottom: 24px;
+}
+.hero-badge::before { content: "●"; color: var(--red); font-size: 8px; }
+.hero-title {
+  font-size: clamp(36px, 4vw, 56px); font-weight: 700;
+  letter-spacing: -1.5px; line-height: 1.08;
+  color: var(--black); margin-bottom: 18px;
+}
+.hero-title em { font-style: italic; color: var(--red); }
+.hero-sub {
+  font-size: 18px; color: #555; margin-bottom: 32px;
+  line-height: 1.7; max-width: 460px;
+}
+.hero-cta {
+  background: var(--red); color: var(--white);
+  padding: 14px 28px; border-radius: 10px;
+  font-size: 16px; font-weight: 600; text-decoration: none;
+  display: inline-block; transition: opacity 0.2s;
+}
+.hero-cta:hover { opacity: 0.85; }
+
+/* BIOMARKER PREVIEW CARD */
+.bm-card {
+  background: var(--black);
+  border-radius: 20px; padding: 28px; overflow: hidden;
+}
+.bm-card-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--red-mid); margin-bottom: 20px;
+}
+.bm-row {
+  background: rgba(255,255,255,0.06); border-radius: 10px;
+  padding: 16px 18px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 16px;
+}
+.bm-row:last-of-type { margin-bottom: 16px; }
+.bm-row-info { flex: 1; }
+.bm-row-name {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.9); text-transform: uppercase; margin-bottom: 2px;
+}
+.bm-row-desc { font-size: 12px; color: rgba(255,255,255,0.5); }
+.bm-row-val {
+  font-size: 32px; font-weight: 700; letter-spacing: -1px; flex-shrink: 0;
+}
+.val-red   { color: #f47f8e; }
+.val-green { color: #4DC98A; }
+.val-amber { color: #f5a623; }
+.bm-delta {
+  font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; flex-shrink: 0;
+}
+.d-down { background: rgba(77,201,138,0.15); color: #4DC98A; }
+.d-flat { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+.bm-note {
+  border-left: 3px solid var(--red);
+  background: rgba(208,2,27,0.08); border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  font-size: 13px; font-style: italic; color: rgba(255,255,255,0.75); line-height: 1.6;
+}
+
+/* SHARED */
+.section-wrap { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
+.section-label {
+  font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--red); margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(28px, 4vw, 42px); font-weight: 700;
+  letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; color: var(--black);
+}
+.section-title em { font-style: italic; color: var(--red); }
+.section-sub {
+  font-size: 17px; color: #666; max-width: 540px;
+  line-height: 1.7; margin-bottom: 48px;
+}
+
+/* BIOMARKERS */
+.measure-section { padding: 80px 0; background: var(--white); }
+.measure-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+.m-card {
+  background: var(--off); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px 24px;
+  border-top: 3px solid transparent; transition: border-top-color 0.2s;
+}
+.m-card:hover { border-top-color: var(--red); }
+.m-tag {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px;
+  border-radius: 6px; margin-bottom: 16px;
+}
+.tag-red   { background: var(--red-lt); color: var(--red); }
+.tag-green { background: #e8f5ee; color: #1a7a45; }
+.tag-amber { background: #fff8e8; color: #b8740a; }
+.m-name { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--black); margin-bottom: 10px; }
+.m-desc { font-size: 14px; color: #666; line-height: 1.65; margin-bottom: 14px; }
+.m-signal { font-size: 13px; font-style: italic; color: var(--muted); line-height: 1.5; }
+
+/* PROOF */
+.proof-section { padding: 80px 0; background: var(--off); }
+.proof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.proof-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px;
+}
+.proof-quote {
+  font-size: 18px; font-style: italic; color: var(--black);
+  line-height: 1.65; margin-bottom: 16px;
+}
+.proof-quote strong { font-style: normal; color: var(--red); }
+.proof-attr { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); }
+
+/* FORM */
+.form-section { padding: 80px 0; background: var(--white); border-top: 1px solid var(--border); }
+.form-wrap {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start;
+}
+.form-box {
+  background: var(--off); border: 1px solid var(--border);
+  border-radius: 20px; padding: 36px;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+}
+.form-box h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
+.form-box > p { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: #555; }
+.form-input, .form-select {
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 15px; font-family: inherit; background: var(--white); outline: none;
+  transition: border-color 0.2s; color: var(--text); -webkit-appearance: none;
+}
+.form-input:focus, .form-select:focus { border-color: var(--red); }
+.form-input::placeholder { color: #bbb; }
+.cb-group { display: flex; flex-direction: column; gap: 10px; }
+.cb-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.cb-item input { display: none; }
+.cb-box {
+  width: 18px; height: 18px; border: 1.5px solid var(--border); border-radius: 4px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
+.cb-item input:checked + .cb-box { background: var(--red); border-color: var(--red); }
+.cb-item input:checked + .cb-box::after { content: '✓'; font-size: 11px; color: white; font-weight: 700; }
+.cb-text { font-size: 15px; color: var(--text); }
+.form-note { font-size: 12px; color: #aaa; line-height: 1.5; margin-bottom: 16px; }
+.submit-btn {
+  width: 100%; background: var(--red); color: var(--white); border: none;
+  padding: 15px; border-radius: 10px; font-family: inherit;
+  font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+}
+.submit-btn:hover { opacity: 0.85; }
+
+/* FOOTER */
+footer { background: var(--black); color: #666; padding: 40px; text-align: center; font-size: 14px; }
+
+@media (max-width: 860px) {
+  nav { padding: 0 20px; }
+  .hero-inner { grid-template-columns: 1fr; padding: 60px 20px; gap: 32px; }
+  .bm-card { display: none; }
+  .section-wrap { padding: 0 20px; }
+  .measure-grid, .proof-grid, .form-wrap { grid-template-columns: 1fr; }
+  .measure-section, .proof-section, .form-section { padding: 60px 0; }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Dr<span>Ruby</span>.ai</a>
+  <a href="index.html" class="nav-back">← Back</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero-wrapper">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">Skin Intelligence · Path 01</div>
+      <h1 class="hero-title">Your skin is telling you <em>something.</em></h1>
+      <p class="hero-sub">
+        Inflammation, melasma, skin that changed faster than expected. DrRuby measures three peer-reviewed imaging biomarkers — so you can see exactly what's happening, and what's actually working.
+      </p>
+      <a href="#join" class="hero-cta">Join the Waitlist →</a>
+    </div>
+    <div class="bm-card">
+      <div class="bm-card-label">Your biomarker snapshot</div>
+      <div class="bm-row">
+        <div class="bm-row-info">
+          <div class="bm-row-name">Inflammation Index</div>
+          <div class="bm-row-desc">Erythema · barrier disruption · immune response</div>
+        </div>
+        <span class="bm-row-val val-red">38</span>
+        <span class="bm-delta d-down">↓ 12%</span>
+      </div>
+      <div class="bm-row">
+        <div class="bm-row-info">
+          <div class="bm-row-name">Collagen Proxy</div>
+          <div class="bm-row-desc">Dermal density · structural aging</div>
+        </div>
+        <span class="bm-row-val val-green">71</span>
+        <span class="bm-delta d-flat">→ stable</span>
+      </div>
+      <div class="bm-row">
+        <div class="bm-row-info">
+          <div class="bm-row-name">Pigment Kinetics</div>
+          <div class="bm-row-desc">Melanin velocity · melasma · hyperpigmentation</div>
+        </div>
+        <span class="bm-row-val val-amber">24</span>
+        <span class="bm-delta d-down">↓ 6%</span>
+      </div>
+      <div class="bm-note">
+        "The retinol you started 6 weeks ago correlates with +8% Collagen Proxy. That $400 serum shows no detectable change."
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT WE MEASURE -->
+<section class="measure-section">
+  <div class="section-wrap">
+    <div class="section-label">What We Measure</div>
+    <h2 class="section-title">Three numbers. All <em>peer-reviewed.</em></h2>
+    <p class="section-sub">Not a beauty score. Three independently interpretable biomarkers — each grounded in published imaging research.</p>
+    <div class="measure-grid">
+      <div class="m-card">
+        <span class="m-tag tag-red">Inflammation</span>
+        <div class="m-name">Inflammation Index</div>
+        <p class="m-desc">Cross-polarized light reveals erythema and barrier disruption — your skin's real-time immune response, acute or chronic.</p>
+        <div class="m-signal">Tells you: Is a new product causing a reaction? Is your barrier healthy?</div>
+      </div>
+      <div class="m-card">
+        <span class="m-tag tag-green">Collagen</span>
+        <div class="m-name">Collagen Proxy</div>
+        <p class="m-desc">UV-A 405nm excitation reveals dermal collagen density via fluorescence — the structural architecture beneath your skin.</p>
+        <div class="m-signal">Tells you: Is your retinol or laser treatment actually working?</div>
+      </div>
+      <div class="m-card">
+        <span class="m-tag tag-amber">Pigmentation</span>
+        <div class="m-name">Pigment Kinetics</div>
+        <p class="m-desc">Multi-spectral analysis tracks melanin distribution and velocity — especially powerful for melasma and post-inflammatory hyperpigmentation.</p>
+        <div class="m-signal">Tells you: Is your melasma getting better or worse?</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="proof-section">
+  <div class="section-wrap">
+    <div class="section-label">Early Users</div>
+    <h2 class="section-title">What they found after <em>90 days.</em></h2>
+    <div class="proof-grid" style="margin-top:0">
+      <div class="proof-card">
+        <p class="proof-quote">"I spent <strong>$600 on IPL</strong> and had no way to know if it worked. DrRuby showed my Pigment Kinetics dropped 18% in 6 weeks. Now I have actual proof."</p>
+        <div class="proof-attr">Jennifer C. · 47 · Melasma · Early Beta</div>
+      </div>
+      <div class="proof-card">
+        <p class="proof-quote">"I stopped using a <strong>$300 serum</strong> after DrRuby showed zero change in Collagen Proxy after 8 weeks. The data told me what my gut already suspected."</p>
+        <div class="proof-attr">Rachel M. · 38 · Perimenopause Skin · Early Beta</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section" id="join">
+  <div class="section-wrap">
+    <div class="form-wrap">
+      <div>
+        <div class="section-label">Join the Waitlist</div>
+        <h2 class="section-title">Stop guessing what's <em>working.</em></h2>
+        <p class="section-sub">First 500 users get 3 months of Pro free. Tell us about your skin — we'll make sure DrRuby is built for you.</p>
+      </div>
+      <form class="form-box" onsubmit="handleSubmit(event)">
+        <h3>Get Early Access</h3>
+        <p>Join the waitlist — free skin preview included at launch.</p>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">First Name</label>
+            <input class="form-input" type="text" placeholder="Your name" required>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" placeholder="your@email.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Age range</label>
+          <select class="form-select">
+            <option value="" disabled selected>Select your age</option>
+            <option>Under 30</option>
+            <option>30–39</option>
+            <option>40–49</option>
+            <option>50–59</option>
+            <option>60+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Main skin concern (pick all that apply)</label>
+          <div class="cb-group">
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">Inflammation / redness / barrier issues</span></label>
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">Melasma or hyperpigmentation</span></label>
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">Skin aging / collagen loss</span></label>
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">Hormonal skin changes (perimenopause)</span></label>
+            <label class="cb-item"><input type="checkbox"><span class="cb-box"></span><span class="cb-text">I want to know if my products are working</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monthly skincare spend</label>
+          <select class="form-select">
+            <option value="" disabled selected>Select range</option>
+            <option>Under $50</option>
+            <option>$50–$150</option>
+            <option>$150–$300</option>
+            <option>$300–$500</option>
+            <option>$500+</option>
+          </select>
+        </div>
+        <p class="form-note">No spam, ever. You can unsubscribe at any time.</p>
+        <button type="submit" class="submit-btn">Join the Waitlist →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 DrRuby.ai · Wellness device. Not intended to diagnose or treat any medical condition.</footer>
+
+<script>
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.submit-btn');
+  btn.textContent = '✓ You\'re on the list!';
+  btn.style.background = '#1a7a45';
+  btn.disabled = true;
+}
+document.querySelectorAll('.cb-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const cb = item.querySelector('input[type="checkbox"]');
+    cb.checked = !cb.checked;
+  });
+});
+</script>
+</body>
+</html>
